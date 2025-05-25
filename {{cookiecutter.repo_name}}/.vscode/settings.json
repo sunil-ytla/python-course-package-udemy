@@ -33,11 +33,11 @@
     "python.analysis.completeFunctionParens": true,
     "editor.rulers": [
         {
-            "column": 88,
+            "column": 99,
             "color": "white"
         },
         {
-            "column": 99,
+            "column": 119,
             "color": "lightgreen"
         }
     ],
