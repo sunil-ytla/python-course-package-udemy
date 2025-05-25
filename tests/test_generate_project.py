@@ -9,12 +9,12 @@ import pytest
 from typing import Generator
 import shutil
 
-THIS_DIR = Path(__file__).parent
-PROJECT_DIR = (THIS_DIR / "../").resolve()
+from tests.utils.project import generate_project
 
 
 
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def project_dir() -> Generator[Path, None, None]:
     template_values = {
         "repo_name": "cookiecutter-test",
@@ -23,34 +23,7 @@ def project_dir() -> Generator[Path, None, None]:
     yield generated_repo_dir
     shutil.rmtree(generated_repo_dir)
 
-def generate_project(template_values: Dict[str, str]) -> Path:
 
-    template_values = deepcopy(template_values)
-    cookiecutter_config = {"default_context": template_values}
-
-    cookiecutter_config_file = PROJECT_DIR / "cookiecutter-test-config.json"
-    cookiecutter_config_file.write_text(
-        json.dumps(cookiecutter_config, indent=2)
-    )
-
-    cmd = [
-        "cookiecutter",
-        str(PROJECT_DIR),
-        "--output-dir",
-        str(PROJECT_DIR / "sample"),
-        "--no-input",
-        "--config-file",
-        str(cookiecutter_config_file),
-    ]
-    print(f"Running command: {' '.join(cmd)}")
-    subprocess.run(cmd, check=True)
-
-    generated_repo_dir = (
-        PROJECT_DIR
-        / "sample"
-        / cookiecutter_config["default_context"]["repo_name"]
-    )
-    return generated_repo_dir
 
 def test_can_generate_project(project_dir: Path) -> None:
     """Test that the project can be generated successfully."""
