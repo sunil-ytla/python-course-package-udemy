@@ -1,17 +1,10 @@
-import subprocess
+"""Test that generated makefile works."""
 
-"""
-generate a project
-linting the project
-    generate project test: assert project_dir.exists()
-    test_linting_passes: make lint-ci
-    test_tests_pass:
-        install all requirements
-        build a wheel and execute tests against it
-"""
+import subprocess
 
 
 def test_linting_passes(project_dir):
+    """Validate that the templatized project has no auto-fixable linting issues."""
     subprocess.run(
         ["make", "lint-ci"],
         cwd=project_dir,  # Change working directory to the project directory for this command
@@ -20,6 +13,7 @@ def test_linting_passes(project_dir):
 
 
 def test_tests_pass(project_dir):
+    """Validate the the templatized tests pass when executed against a templatized project."""
     subprocess.run(
         ["make", "install"],
         cwd=project_dir,
@@ -30,18 +24,3 @@ def test_tests_pass(project_dir):
         cwd=project_dir,
         check=True,
     )
-
-
-"""
-Setup:
-1. Generate project using cookiecutter.
-2. create virtual environment and install the project dependencies.
-
-Tests:
-3. Run linting checks.
-4. Run tests.
-
-cleanup/teardown:
-5. Remove the virtual environment.
-6. Remove the generated project directory
-"""

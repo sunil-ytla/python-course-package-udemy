@@ -1,3 +1,5 @@
+"""Fixture for a reusable cookiecut template project for tests."""
+
 import shutil
 import subprocess
 from pathlib import Path
@@ -6,6 +8,7 @@ from uuid import uuid4
 
 import pytest
 
+# pylint: disable=no-name-in-module
 from tests.utils.project import (
     generate_project,
     initialize_git_repo,
@@ -16,6 +19,7 @@ from tests.utils.project import (
     scope="session"
 )  # we want to generate the project only once per session
 def project_dir() -> Generator[Path, None, None]:
+    """Create an instance of our cookiecutter template to be re-used in tests."""
     test_session_id: str = generate_test_session_id()
     template_values = {
         "repo_name": f"cookiecutter-test-{test_session_id}",
@@ -34,5 +38,5 @@ def project_dir() -> Generator[Path, None, None]:
 
 
 def generate_test_session_id() -> str:
-    """Generate a random UUID."""
+    """Return a randomly generated, unique string."""
     return str(uuid4())[:6]
