@@ -23,6 +23,7 @@ def project_dir() -> Generator[Path, None, None]:
     test_session_id: str = generate_test_session_id()
     template_values = {
         "repo_name": f"cookiecutter-test-{test_session_id}",
+        "package_import_name": f"cookiecutter_test_{test_session_id}",
     }
     generated_repo_dir: Path = generate_project(template_values, test_session_id)
     try:
