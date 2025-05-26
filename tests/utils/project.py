@@ -1,17 +1,45 @@
 
 import json
 import re
+import shutil
 import subprocess
+from copy import deepcopy
 from pathlib import Path
 from tempfile import template
-from typing import Dict
-from copy import deepcopy
+from typing import (
+    Dict,
+    Generator,
+)
+
 import pytest
-from typing import Generator
-import shutil
 
 from tests.consts import PROJECT_DIR
 
+
+def initialize_git_repo(repo_dir: Path) -> None:
+    # git init
+    subprocess.run(
+        ["git", "init", str(repo_dir)],
+        check=True,
+        cwd=repo_dir,
+    )
+    
+    # commit the contents to main branch
+    subprocess.run(
+        ["git", "branch", "-M", "main"],
+        check=True,
+        cwd=repo_dir,
+    )
+    subprocess.run(
+        ["git", "add", "--all"],
+        check=True,
+        cwd=repo_dir,
+    )
+    subprocess.run(
+        ["git", "commit", "-m", "feat: Initial commit by pytest"],
+        check=True,
+        cwd=repo_dir,
+    )
 
 def generate_project(template_values: Dict[str, str]) -> Path:
 
