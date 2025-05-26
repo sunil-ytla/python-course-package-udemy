@@ -1,9 +1,6 @@
 import sys
 from pathlib import Path
 
-import pytest
-
-
 THIS_DIR = Path(__file__).parent
 TESTS_DIR_PARENT = (THIS_DIR / "..").resolve()
 

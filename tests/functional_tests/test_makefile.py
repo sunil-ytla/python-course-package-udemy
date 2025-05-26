@@ -5,7 +5,7 @@ generate a project
 linting the project
     generate project test: assert project_dir.exists()
     test_linting_passes: make lint-ci
-    test_tests_pass: 
+    test_tests_pass:
         install all requirements
         build a wheel and execute tests against it
 """

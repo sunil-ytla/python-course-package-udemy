@@ -1,17 +1,11 @@
 
 import json
-import re
-import shutil
 import subprocess
 from copy import deepcopy
 from pathlib import Path
-from tempfile import template
 from typing import (
     Dict,
-    Generator,
 )
-
-import pytest
 
 from tests.consts import PROJECT_DIR
 
@@ -23,7 +17,7 @@ def initialize_git_repo(repo_dir: Path) -> None:
         check=True,
         cwd=repo_dir,
     )
-    
+
     # commit the contents to main branch
     subprocess.run(
         ["git", "branch", "-M", "main"],

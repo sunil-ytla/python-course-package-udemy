@@ -1,10 +1,16 @@
+import shutil
 import subprocess
-import pytest
 from pathlib import Path
 from typing import Generator
-import shutil
-from tests.utils.project import generate_project, initialize_git_repo
 from uuid import uuid4
+
+import pytest
+
+from tests.utils.project import (
+    generate_project,
+    initialize_git_repo,
+)
+
 
 @pytest.fixture(scope="session") # we want to generate the project only once per session
 def project_dir() -> Generator[Path, None, None]:
