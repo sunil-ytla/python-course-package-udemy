@@ -12,7 +12,9 @@ from tests.utils.project import (
 )
 
 
-@pytest.fixture(scope="session") # we want to generate the project only once per session
+@pytest.fixture(
+    scope="session"
+)  # we want to generate the project only once per session
 def project_dir() -> Generator[Path, None, None]:
     test_session_id: str = generate_test_session_id()
     template_values = {

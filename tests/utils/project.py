@@ -1,4 +1,3 @@
-
 import json
 import subprocess
 from copy import deepcopy
@@ -35,15 +34,14 @@ def initialize_git_repo(repo_dir: Path) -> None:
         cwd=repo_dir,
     )
 
+
 def generate_project(template_values: Dict[str, str], test_session_id: str) -> Path:
 
     template_values = deepcopy(template_values)
     cookiecutter_config = {"default_context": template_values}
 
     cookiecutter_config_file = PROJECT_DIR / f"cookiecutter-{test_session_id}.json"
-    cookiecutter_config_file.write_text(
-        json.dumps(cookiecutter_config, indent=2)
-    )
+    cookiecutter_config_file.write_text(json.dumps(cookiecutter_config, indent=2))
 
     cmd = [
         "cookiecutter",
@@ -58,8 +56,6 @@ def generate_project(template_values: Dict[str, str], test_session_id: str) -> P
     subprocess.run(cmd, check=True)
 
     generated_repo_dir = (
-        PROJECT_DIR
-        / "sample"
-        / cookiecutter_config["default_context"]["repo_name"]
+        PROJECT_DIR / "sample" / cookiecutter_config["default_context"]["repo_name"]
     )
     return generated_repo_dir

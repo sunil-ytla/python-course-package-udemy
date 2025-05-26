@@ -8,4 +8,4 @@ sys.path.insert(0, str(TESTS_DIR_PARENT))
 
 pytest_plugins = [
     "tests.fixtures.project_dir"
-] # this will register our fixtures automatically
+]  # this will register our fixtures automatically

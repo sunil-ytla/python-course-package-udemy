@@ -10,12 +10,14 @@ linting the project
         build a wheel and execute tests against it
 """
 
+
 def test_linting_passes(project_dir):
     subprocess.run(
         ["make", "lint-ci"],
-        cwd=project_dir, # Change working directory to the project directory for this command
-        check=True, # Ensure the command raises an error if linting fails
+        cwd=project_dir,  # Change working directory to the project directory for this command
+        check=True,  # Ensure the command raises an error if linting fails
     )
+
 
 def test_tests_pass(project_dir):
     subprocess.run(
