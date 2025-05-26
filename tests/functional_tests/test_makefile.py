@@ -30,10 +30,6 @@ def test_tests_pass(project_dir):
     )
 
 
-def test_install_suceeds():
-    ...
-
-
 """
 Setup:
 1. Generate project using cookiecutter.
