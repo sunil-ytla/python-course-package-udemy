@@ -41,12 +41,12 @@ def initialize_git_repo(repo_dir: Path) -> None:
         cwd=repo_dir,
     )
 
-def generate_project(template_values: Dict[str, str]) -> Path:
+def generate_project(template_values: Dict[str, str], test_session_id: str) -> Path:
 
     template_values = deepcopy(template_values)
     cookiecutter_config = {"default_context": template_values}
 
-    cookiecutter_config_file = PROJECT_DIR / "cookiecutter-test-config.json"
+    cookiecutter_config_file = PROJECT_DIR / f"cookiecutter-{test_session_id}.json"
     cookiecutter_config_file.write_text(
         json.dumps(cookiecutter_config, indent=2)
     )
