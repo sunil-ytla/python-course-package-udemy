@@ -9,8 +9,17 @@ def test_linting_passes(project_dir):
         check=True, # Ensure the command raises an error if linting fails
     )
 
-def test_tests_pass():
-    ...
+def test_tests_pass(project_dir):
+    subprocess.run(
+        ["make", "install"],
+        cwd=project_dir,
+        check=True,
+    )
+    subprocess.run(
+        ["make", "test-wheel-locally"],
+        cwd=project_dir,
+        check=True,
+    )
 
 
 def test_install_suceeds():
