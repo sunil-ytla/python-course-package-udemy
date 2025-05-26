@@ -82,6 +82,36 @@ function try-load-dotenv {
     done < <(grep -v '^#' "$THIS_DIR/.env" | grep -v '^$')
 }
 
+# args: 
+#   REPO_NAME - name of the repository
+#   GITHUB_USERNAME - github username
+#   IS_PUBLIC - whether the repository is public, (default: false)
+function create-repo-if-not-exists {
+
+    local IS_PUBLIC=${IS_PUBLIC:-false}
+    
+    # check if the repository already exists, if it does return
+    echo "Checking if repository $GITHUB_USERNAME/$REPO_NAME exists..."
+    gh repo view "$GITHUB_USERNAME/$REPO_NAME" > /dev/null \
+        && echo "repo exists, exiting..." && return 0
+
+    echo "Repository $GITHUB_USERNAME/$REPO_NAME does not exist, creating it..."
+    if [[ "$IS_PUBLIC" == "true" ]]; then
+        PUBLIC_OR_PRIVATE="--public"
+    else
+        PUBLIC_OR_PRIVATE="--private"
+    fi
+    gh repo create "$GITHUB_USERNAME/$REPO_NAME" $PUBLIC_OR_PRIVATE --confirm
+}
+
+function configure-repo {
+    echo "..."
+}
+
+function open-pr-with-generated-project {
+    echo "..."
+}
+
 # print all functions in this file
 function help {
     echo "$0 <task> <args>"
