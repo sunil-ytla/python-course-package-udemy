@@ -117,6 +117,10 @@ function push-initial-readme-to-repo {
     git branch -M main || true
     git add --all
     git commit -m "feat: initialize repository"
+    # if GH_TOKEN is set, use it to authenticate with GitHub (used in CI/CD or github actions workflows)
+    if [[ -n "$GH_TOKEN" ]]; then
+        git remote set-url origin "https://$GITHUB_USERNAME:$GH_TOKEN@github.com/$GITHUB_USERNAME/$REPO_NAME"
+    fi
     git push origin main
 }
 
@@ -150,6 +154,19 @@ function configure-repo {
         -F "enforce_admins=null" \
         -F "restrictions=null" > /dev/null
 
+}
+
+function create-sample-repo {
+
+    git add .github/ \
+    && git commit -m "chore: add github workflows for creating and updating repositories"
+    && git push origin main || true
+
+    gh workflow run .github/workflows/create-or-update-repo.yaml \
+        --ref main \
+        --field repo_name=generated-repo-3 \
+        --field package_import_name=generated_repo_3 \
+        --field is_public_repo=false
 }
 
 # args:
@@ -206,6 +223,12 @@ EOF
 
     # commit the changes and push them to the remote feature branch
     git commit -m "feat: populate repository from cookiecutter template"
+
+    # if GH_TOKEN is set, use it to authenticate with GitHub (used in CI/CD or github actions workflows)
+    if [[ -n "$GH_TOKEN" ]]; then
+        git remote set-url origin "https://$GITHUB_USERNAME:$GH_TOKEN@github.com/$GITHUB_USERNAME/$REPO_NAME"
+    fi
+
     git push origin "$UNIQUE_BRANCH_NAME"
 
 
