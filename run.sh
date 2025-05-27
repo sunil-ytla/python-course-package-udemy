@@ -120,13 +120,42 @@ function push-initial-readme-to-repo {
     git push origin main
 }
 
+# args:
+#   TEST_PYPI_TOKEN - token for test pypi
+#   PROD_PYPI_TOKEN - token for production pypi
+#   GITHUB_USERNAME - github username
+#   REPO_NAME - name of the repository
+
+# eg: GITHUB_USERNAME=sunil-ytla REPO_NAME=generated-repo-2 TEST_PYPI_TOKEN=sample-test PROD_PYPI_TOKEN=sample-prod bash run.sh configure-repo
 function configure-repo {
-    echo "..."
+    # configure github actions secrets
+    gh secret set TEST_PYPI_TOKEN \
+        --body "$TEST_PYPI_TOKEN" \
+        --repo "$GITHUB_USERNAME/$REPO_NAME"
+
+    gh secret set PROD_PYPI_TOKEN \
+        --body "$PROD_PYPI_TOKEN" \
+        --repo "$GITHUB_USERNAME/$REPO_NAME"
+    
+    # protect main branch, enforcing passing build on feature branch before merge
+    BRANCH_NAME="main"
+    gh api -X PUT "repos/$GITHUB_USERNAME/$REPO_NAME/branches/$BRANCH_NAME/protection" \
+        -H "Accept: application/vnd.github+json" \
+        -F "required_status_checks[strict]=true" \
+        -F "required_status_checks[checks][][context]=check-version-txt" \
+        -F "required_status_checks[checks][][context]=lint-format-and-static-code-checks" \
+        -F "required_status_checks[checks][][context]=build-wheel-and-sdist" \
+        -F "required_status_checks[checks][][context]=execute-tests" \
+        -F "required_pull_request_reviews[required_approving_review_count]=0" \
+        -F "enforce_admins=null" \
+        -F "restrictions=null" > /dev/null
+
 }
 
 # args:
 #   REPO_NAME - name of the repository
 #   GITHUB_USERNAME - github username
+#   PACKAGE_IMPORT_NAME - eg. if "example_pkg" then imported as "import example_pkg"
 function open-pr-with-generated-project {
 
     rm -rf "$REPO_NAME" ./outdir
@@ -148,6 +177,7 @@ function open-pr-with-generated-project {
     cat <<EOF > "$CONFIG_FILE_PATH"
 default_context:
   repo_name: "$REPO_NAME"
+  package_import_name: "$PACKAGE_IMPORT_NAME"
 EOF
 
     cookiecutter ./ \
@@ -160,7 +190,11 @@ EOF
     # stage the generated files into new feature branch
     mv "$REPO_NAME/.git" "$OUTDIR/$REPO_NAME/.git"
     cd "$OUTDIR/$REPO_NAME"
-    git checkout -b "feat/populating-from-template"
+
+    UUID=$(cat /proc/sys/kernel/random/uuid)
+    UNIQUE_BRANCH_NAME=feat/populating-from-template-${UUID:0:6}
+
+    git checkout -b "$UNIQUE_BRANCH_NAME"
     git add --all
 
     # apply formatting and linting autofixes to generated files
@@ -172,7 +206,7 @@ EOF
 
     # commit the changes and push them to the remote feature branch
     git commit -m "feat: populate repository from cookiecutter template"
-    git push origin "feat/populating-from-template"
+    git push origin "$UNIQUE_BRANCH_NAME"
 
 
     # open a PR from the feature branch to main
@@ -180,7 +214,7 @@ EOF
         --title "feat: populate repository from cookiecutter template" \
         --body "This PR populates the repository with the initial project structure and files generated from the cookiecutter template." \
         --base main \
-        --head "feat/populating-from-template" \
+        --head "$UNIQUE_BRANCH_NAME" \
         --repo "$GITHUB_USERNAME/$REPO_NAME"
 }
 
