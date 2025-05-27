@@ -82,14 +82,14 @@ function try-load-dotenv {
     done < <(grep -v '^#' "$THIS_DIR/.env" | grep -v '^$')
 }
 
-# args: 
+# args:
 #   REPO_NAME - name of the repository
 #   GITHUB_USERNAME - github username
 #   IS_PUBLIC - whether the repository is public, (default: false)
 function create-repo-if-not-exists {
 
     local IS_PUBLIC=${IS_PUBLIC:-false}
-    
+
     # check if the repository already exists, if it does return
     echo "Checking if repository $GITHUB_USERNAME/$REPO_NAME exists..."
     gh repo view "$GITHUB_USERNAME/$REPO_NAME" > /dev/null \
@@ -105,10 +105,10 @@ function create-repo-if-not-exists {
     gh repo create "$GITHUB_USERNAME/$REPO_NAME" $PUBLIC_OR_PRIVATE --confirm
 
     push-initial-readme-to-repo
-    
+
 }
 
-# args: 
+# args:
 #   REPO_NAME - name of the repository
 #   GITHUB_USERNAME - github username
 function push-initial-readme-to-repo {
@@ -141,7 +141,7 @@ function configure-repo {
     gh secret set PROD_PYPI_TOKEN \
         --body "$PROD_PYPI_TOKEN" \
         --repo "$GITHUB_USERNAME/$REPO_NAME"
-    
+
     # protect main branch, enforcing passing build on feature branch before merge
     BRANCH_NAME="main"
     gh api -X PUT "repos/$GITHUB_USERNAME/$REPO_NAME/branches/$BRANCH_NAME/protection" \
@@ -202,7 +202,7 @@ EOF
         --output-dir "$OUTDIR" \
         --no-input \
         --config-file $CONFIG_FILE_PATH
-    
+
     rm "$CONFIG_FILE_PATH"
 
     # stage the generated files into new feature branch

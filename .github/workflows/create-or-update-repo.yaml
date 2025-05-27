@@ -40,7 +40,7 @@ jobs:
           IS_PUBLIC: ${{ github.event.inputs.is_public_repo }}
         run: |
           bash run.sh create-repo-if-not-exists
-  
+
   configure-repo:
     needs:
       - create-repo-if-not-exists
@@ -60,7 +60,7 @@ jobs:
           PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
           REPO_NAME: ${{ github.event.inputs.repo_name }}
           GITHUB_USERNAME: sunil-ytla
-  
+
   open-pr-with-generated-project:
     needs:
       - create-repo-if-not-exists
