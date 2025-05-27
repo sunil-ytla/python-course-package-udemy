@@ -102,14 +102,86 @@ function create-repo-if-not-exists {
         PUBLIC_OR_PRIVATE="--private"
     fi
     gh repo create "$GITHUB_USERNAME/$REPO_NAME" $PUBLIC_OR_PRIVATE --confirm
+
+    push-initial-readme-to-repo
+    
+}
+
+# args: 
+#   REPO_NAME - name of the repository
+#   GITHUB_USERNAME - github username
+function push-initial-readme-to-repo {
+    gh repo clone "$GITHUB_USERNAME/$REPO_NAME"
+    cd "$REPO_NAME"
+    echo "# $REPO_NAME" > "README.md"
+    git branch -M main || true
+    git add --all
+    git commit -m "feat: initialize repository"
+    git push origin main
 }
 
 function configure-repo {
     echo "..."
 }
 
+# args:
+#   REPO_NAME - name of the repository
+#   GITHUB_USERNAME - github username
 function open-pr-with-generated-project {
-    echo "..."
+
+    rm -rf "$REPO_NAME" ./outdir
+    install
+
+    # clone the repository
+    gh repo clone "$GITHUB_USERNAME/$REPO_NAME"
+
+
+    # delete repository contents
+    mv "$REPO_NAME/.git" "./$REPO_NAME.git.bak"
+    rm -rf "$REPO_NAME"
+    mkdir "$REPO_NAME"
+    mv "./$REPO_NAME.git.bak" "$REPO_NAME/.git"
+
+    # generate the project into the repository folder
+    OUTDIR="./outdir/"
+    CONFIG_FILE_PATH="./$REPO_NAME.yaml"
+    cat <<EOF > "$CONFIG_FILE_PATH"
+default_context:
+  repo_name: "$REPO_NAME"
+EOF
+
+    cookiecutter ./ \
+        --output-dir "$OUTDIR" \
+        --no-input \
+        --config-file $CONFIG_FILE_PATH
+    
+    rm "$CONFIG_FILE_PATH"
+
+    # stage the generated files into new feature branch
+    mv "$REPO_NAME/.git" "$OUTDIR/$REPO_NAME/.git"
+    cd "$OUTDIR/$REPO_NAME"
+    git checkout -b "feat/populating-from-template"
+    git add --all
+
+    # apply formatting and linting autofixes to generated files
+    lint:ci || true # run linting and formatting, but ignore errors
+
+    # re-stage the files modified by pre-commit
+    git add --all
+
+
+    # commit the changes and push them to the remote feature branch
+    git commit -m "feat: populate repository from cookiecutter template"
+    git push origin "feat/populating-from-template"
+
+
+    # open a PR from the feature branch to main
+    gh pr create \
+        --title "feat: populate repository from cookiecutter template" \
+        --body "This PR populates the repository with the initial project structure and files generated from the cookiecutter template." \
+        --base main \
+        --head "feat/populating-from-template" \
+        --repo "$GITHUB_USERNAME/$REPO_NAME"
 }
 
 # print all functions in this file
