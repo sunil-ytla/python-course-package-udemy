@@ -160,7 +160,7 @@ function configure-repo {
 function create-sample-repo {
 
     git add .github/ \
-    && git commit -m "chore: add github workflows for creating and updating repositories"
+    && git commit -m "chore: add github workflows for creating and updating repositories" \
     && git push origin main || true
 
     gh workflow run .github/workflows/create-or-update-repo.yaml \
